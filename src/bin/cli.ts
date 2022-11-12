@@ -38,8 +38,8 @@ rl.question(
     console.log(
       `Installing dependencies for ${projectName} using ${packageManager}`
     );
-    const defaultCommand = `cd ${projectName} && ${packageManager} install`;
-    const otherCommand = `cd ${projectName} && rm -rf yarn.lock .yarn .yarnrc.yml && ${packageManager} install`;
+    const defaultCommand = `cd ${projectName} && rm -rf .git && ${packageManager} install`;
+    const otherCommand = `cd ${projectName} && rm -rf yarn.lock .yarn .yarnrc.yml .git && ${packageManager} install`;
     const installCommand =
       packageManager === 'yarn' ? defaultCommand : otherCommand;
     const installedDeps = runCommand(installCommand);
