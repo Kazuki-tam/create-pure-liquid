@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execSync } from 'child_process';
 import { showSuccessMessage } from './helper/showSuccessMessage';
-import * as readline from 'readline';
+import inquirer from 'inquirer';
 
 const runCommand = (command: string) => {
   try {
@@ -13,8 +13,7 @@ const runCommand = (command: string) => {
   return true;
 };
 
-const projectName = process.argv[2];
-let packageManager = 'yarn';
+const projectName = process.argv[2] || 'pure-liquid';
 const gitCheckoutCommand = `git clone --depth 1 https://github.com/Kazuki-tam/pure-liquid.git ${projectName}`;
 
 console.log(`Cloning the repository with name ${projectName}`);
@@ -22,31 +21,44 @@ console.log(`Cloning the repository with name ${projectName}`);
 const checkOut = runCommand(gitCheckoutCommand);
 if (!checkOut) process.exit();
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+const listQuestions = [
+  {
+    type: 'list',
+    name: 'manager',
+    message:
+      'What package manager do you want to use?(type: npm or yarn or pnpm)',
+    choices: ['yarn', 'pnpm', 'npm'],
+  },
+];
 
-rl.question(
-  'What package manager do you want to use?(type: npm or yarn or pnpm) ',
-  (input) => {
-    if (
-      input.toLocaleLowerCase() == 'npm' ||
-      input.toLocaleLowerCase() == 'pnpm'
-    )
-      packageManager = input.toLocaleLowerCase();
+type managerType = {
+  manager: string;
+};
+
+inquirer
+  .prompt(listQuestions)
+  .then((answers: managerType) => {
+    const packageManager = answers.manager || 'yarn';
     console.log(
       `Installing dependencies for ${projectName} using ${packageManager}`
     );
+    return packageManager;
+  })
+  .then((packageManager) => {
     const defaultCommand = `cd ${projectName} && rm -rf .git && ${packageManager} install`;
     const otherCommand = `cd ${projectName} && rm -rf yarn.lock .yarn .yarnrc.yml .git && ${packageManager} install`;
     const installCommand =
       packageManager === 'yarn' ? defaultCommand : otherCommand;
     const installedDeps = runCommand(installCommand);
     if (!installedDeps) process.exit();
-    rl.close();
-  }
-);
-rl.on('close', () => {
-  showSuccessMessage('💧', projectName, packageManager);
-});
+    showSuccessMessage('💧', projectName, packageManager);
+  })
+  .catch((error: { isTtyError: string }) => {
+    if (error.isTtyError) {
+      // Prompt couldn't be rendered in the current environment
+      throw new Error(`Prompt couldn't be render in current environment...`);
+    } else {
+      // Something else went wrong
+      throw new Error(`Something else went wrong...`);
+    }
+  });
