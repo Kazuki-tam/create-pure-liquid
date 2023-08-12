@@ -40,7 +40,7 @@ inquirer
   .then((answers: managerType) => {
     const packageManager = answers.manager || 'yarn';
     console.log(
-      `Installing dependencies for ${projectName} using ${packageManager}`
+      `Installing dependencies for ${projectName} using ${packageManager}`,
     );
     return packageManager;
   })
