@@ -5,7 +5,7 @@ import chalk from 'chalk';
 export const showSuccessMessage = (
   emoji: string,
   projectName: string,
-  packageManager: string
+  packageManager: string,
 ) => {
   const message = 'Pure Liquid';
   const isEmoji = emojiRegex().exec(emoji);
@@ -20,13 +20,13 @@ export const showSuccessMessage = (
     console.log(decoration);
     console.log(
       chalk.blue(
-        '\nYou are ready to develop! Follow the following commands to start.\n'
-      )
+        '\nYou are ready to develop! Follow the following commands to start.\n',
+      ),
     );
     console.log(
       chalk.green(
-        `cd ${projectName} && ${packageManager} run build && ${packageManager} run start\n`
-      )
+        `cd ${projectName} && ${packageManager} run build && ${packageManager} run start\n`,
+      ),
     );
   });
   return true;
